@@ -33,6 +33,7 @@ func SlowSearch(out io.Writer) {
 	lines := strings.Split(string(fileContents), "\n")
 
 	users := make([]map[string]interface{}, 0)
+	
 	for _, line := range lines {
 		user := make(map[string]interface{})
 		// fmt.Printf("%v %v\n", err, line)

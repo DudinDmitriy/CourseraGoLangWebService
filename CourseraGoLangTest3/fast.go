@@ -17,11 +17,12 @@ func FastSearch(out io.Writer) {
 		panic(err)
 	}
 
+	//нужно читать файл построчно
 	fileContents, err := ioutil.ReadAll(file)
 	if err != nil {
 		panic(err)
 	}
-
+    //затем каждую строку обрабатывать
 	r := regexp.MustCompile("@")
 	seenBrowsers := []string{}
 	uniqueBrowsers := 0
@@ -32,7 +33,10 @@ func FastSearch(out io.Writer) {
 
 	lines := strings.Split(string(fileContents), "\n")
 
-	users := make([]map[string]interface{}, 0)
+	//users := make([]map[string]interface{}, 0,)
+
+	users := make([]map[string]interface{}, 0, len(lines))
+
 	for _, line := range lines {
 		user := make(map[string]interface{})
 		// fmt.Printf("%v %v\n", err, line)
@@ -61,13 +65,8 @@ func FastSearch(out io.Writer) {
 				continue
 			}
 
-			browserrowbyte, ok := browserRaw.([]byte)
-			if !ok {
-				// log.Println("cant cast browser to string")
-				continue
-			}
 			//			if ok, err := regexp.MatchString("Android", browser); ok && err == nil {
-			if ok := regexp1.Match(browserrowbyte); ok && err1 == nil {
+			if ok := regexp1.MatchString(browser); ok && err1 == nil {
 				isAndroid = true
 				notSeenBefore := true
 				for _, item := range seenBrowsers {
@@ -90,12 +89,8 @@ func FastSearch(out io.Writer) {
 				continue
 			}
 			//			if ok, err := regexp.MatchString("MSIE", browser); ok && err == nil {
-			browserrowbyte, ok := browserRaw.([]byte)
-			if !ok {
-				// log.Println("cant cast browser to string")
-				continue
-			}
-			if ok := regexp2.Match(browserrowbyte); ok && err2 == nil {
+
+			if ok := regexp2.MatchString(browser); ok && err2 == nil {
 				isMSIE = true
 				notSeenBefore := true
 				for _, item := range seenBrowsers {
