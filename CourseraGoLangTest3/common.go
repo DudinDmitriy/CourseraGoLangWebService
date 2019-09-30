@@ -14,7 +14,7 @@ import (
 const filePath string = "./data/users.txt"
 
 func SlowSearch(out io.Writer) {
-	
+
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -109,4 +109,8 @@ func SlowSearch(out io.Writer) {
 
 	fmt.Fprintln(out, "found users:\n"+foundUsers)
 	fmt.Fprintln(out, "Total unique browsers", len(seenBrowsers))
+}
+
+func main() {
+	fmt.Println("Main func is go")
 }
