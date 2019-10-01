@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
@@ -23,15 +21,53 @@ func FastSearch(out io.Writer) {
 	uniqueBrowsers := 0
 	foundUsers := ""
 
+	var strBuilder strings.Builder
+
+	type strData struct {
+		browsers []string
+		email    string
+		name     string
+	}
+
 	regexp1, err1 := regexp.Compile("Android")
 	regexp2, err2 := regexp.Compile("MSIE")
-	user := make(map[string]interface{})
-	
-	fileScanText := bufio.NewScanner(file)
-	for fileScanText.Scan() {
+	//user := make(map[string]interface{})
 
-		strByte := fileScanText.Bytes()
-		err = json.Unmarshal(strByte, &user)
+	jsonReader := json.NewDecoder(file)
+
+	t, err := jsonReader.Token()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%T: %v\n", t, t)
+
+	var strtest interface{}
+	
+	err = jsonReader.Decode(&strtest)
+	fmt.Printf("%v", strtest)
+
+	if err != nil {
+		panic(err)
+	}
+
+	jsonReader.More()
+
+	t, err = jsonReader.Token()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%T: %v\n", t, t)
+
+	//fileScanText := bufio.NewScanner(file)
+
+	for i := 0; jsonReader.More(); i++ {
+
+
+		var dataline strData
+
+		err = jsonReader.Decode(&dataline)
+		fmt.Printf("%v", dataline)
+
 		if err != nil {
 			panic(err)
 		}
@@ -39,18 +75,23 @@ func FastSearch(out io.Writer) {
 		isAndroid := false
 		isMSIE := false
 
-		browsers, ok := user["browsers"].([]interface{})
-		if !ok {
-			// log.Println("cant cast browsers")
-			continue
-		}
+		//		browsers, ok := user["browsers"].([]interface{})
+		browsers := dataline.browsers
+
+		// if !ok {
+		// 	// log.Println("cant cast browsers")
+		// 	continue
+		// }
 
 		for _, browserRaw := range browsers {
-			browser, ok := browserRaw.(string)
-			if !ok {
-				// log.Println("cant cast browser to string")
-				continue
-			}
+
+			browser := browserRaw
+
+			//browser, ok := browserRaw
+			// if !ok {
+			// 	// log.Println("cant cast browser to string")
+			// 	continue
+			// }
 
 			//			if ok, err := regexp.MatchString("Android", browser); ok && err == nil {
 			if ok := regexp1.MatchString(browser); ok && err1 == nil {
@@ -70,11 +111,13 @@ func FastSearch(out io.Writer) {
 		}
 
 		for _, browserRaw := range browsers {
-			browser, ok := browserRaw.(string)
-			if !ok {
-				// log.Println("cant cast browser to string")
-				continue
-			}
+
+			browser := browserRaw
+			// browser, ok := browserRaw.(string)
+			// if !ok {
+			// 	// log.Println("cant cast browser to string")
+			// 	continue
+			// }
 			//			if ok, err := regexp.MatchString("MSIE", browser); ok && err == nil {
 
 			if ok := regexp2.MatchString(browser); ok && err2 == nil {
@@ -98,16 +141,22 @@ func FastSearch(out io.Writer) {
 		}
 
 		// log.Println("Android and MSIE user:", user["name"], user["email"])
-		email := r.ReplaceAllString(user["email"].(string), " [at] ")
-		foundUsers += fmt.Sprintf("[%d] %s <%s>\n", i, user["name"], email)
+		//email := r.ReplaceAllString(dataline.email, " [at] ")
+		email := r.ReplaceAllString("   ", " [at] ")
+		//		email := r.ReplaceAllString(user["email"].(string), " [at] ")
+		//		strBuilder.WriteString(fmt.Sprintf("[%d] %s <%s>\n", i, dataline.name, email))
+		strBuilder.WriteString(fmt.Sprintf("[%d] %s <%s>\n", i, "dataline.name", email))
+		//foundUsers += fmt.Sprintf("[%d] %s <%s>\n", i, user["name"], email)
 	}
+
+	foundUsers = strBuilder.String()
 
 	//нужно читать файл построчно
 	// fileContents, err := ioutil.ReadAll(file)
 	// if err != nil {
 	// 	panic(err)
 	// }
-    //затем каждую строку обрабатывать
+	//затем каждую строку обрабатывать
 	// r := regexp.MustCompile("@")
 	// seenBrowsers := []string{}
 	// uniqueBrowsers := 0

@@ -2,11 +2,7 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"io"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
 func main() {
@@ -22,6 +18,6 @@ func main() {
 	}
 }
 
-func dirTree(out *bytes.Buffer,path string,printfile bool){
+func dirTree(out *bytes.Buffer, path string, printfile bool) {
 
 }

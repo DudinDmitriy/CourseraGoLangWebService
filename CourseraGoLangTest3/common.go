@@ -113,5 +113,8 @@ func SlowSearch(out io.Writer) {
 }
 
 func main() {
+	
 	fmt.Println("Main func is go")
+	FastSearch(os.Stdout)
+
 }
