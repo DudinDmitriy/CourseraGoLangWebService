@@ -8,10 +8,12 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 // вам надо написать более быструю оптимальную этой функции
 func FastSearch(out io.Writer) {
+
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -46,6 +48,9 @@ func FastSearch(out io.Writer) {
 			panic(err)
 		}
 
+//		fmt.Printf("%v \n", dataline)
+
+
 		isAndroid := false
 		isMSIE := false
 		notSeenBefore := true
@@ -58,7 +63,7 @@ func FastSearch(out io.Writer) {
 		// 	continue
 		// }
 
-		for _, browserRaw := range browsers {
+		for _, browserRaw := range dataline.Browsers {
 
 			//			if ok, err := regexp.MatchString("Android", browser); ok && err == nil {
 			if ok := regexp1.MatchString(browserRaw); ok && err1 == nil {
