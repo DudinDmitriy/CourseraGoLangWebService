@@ -12,6 +12,15 @@ type User struct {
 	Flags    int
 }
 
+// lets generate code for this struct
+// cgen: binpack
+type MyStruct struct {
+	ID       int
+	RealName string `cgen:"-"`
+	Login    string
+	Flags    int
+}
+
 type Avatar struct {
 	ID  int
 	Url string
