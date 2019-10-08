@@ -25,24 +25,30 @@ func FastSearch(out io.Writer) {
 	var strBuilder strings.Builder
 	strBuilder.WriteString("found users:\n")
 
-	type StrData struct {
+
+	type Strdata struct {
 		Browsers []string "json:browsers"
-		Email    string   "json:email"
-		Name     string   "json:name"
+		Email    string "json:email"
+		Name     string "json:name"
 	}
 
-	r := regexp.MustCompile("@")
+	var dataPool = sync.Pool{
+		New: func() interface{} {
+			return &Strdata{}
+		},
+	}
+
 	regexp1, err1 := regexp.Compile("Android")
 	regexp2, err2 := regexp.Compile("MSIE")
-	//user := make(map[string]interface{})
 
-	fileScanText := bufio.NewScanner(file)
-	var dataline StrData
+    scanfile := bufio.NewScanner(file)
 
-	for i := 0; fileScanText.Scan(); i++ {
+	for i:=0;scanfile.Scan();i++{
 
-		tmpbyte := fileScanText.Bytes()
-		err = json.Unmarshal(tmpbyte, &dataline)
+		dataline := dataPool.Get().(*Strdata)
+		
+
+		err := json.Unmarshal(scanfile.Bytes(),dataline)
 
 		if err != nil {
 			panic(err)
@@ -56,7 +62,7 @@ func FastSearch(out io.Writer) {
 		notSeenBefore := true
 
 		//		browsers, ok := user["browsers"].([]interface{})
-		browsers := dataline.Browsers
+		//browsers := dataline.Browsers
 
 		// if !ok {
 		// 	// log.Println("cant cast browsers")
@@ -64,6 +70,14 @@ func FastSearch(out io.Writer) {
 		// }
 
 		for _, browserRaw := range dataline.Browsers {
+
+			browser := browserRaw
+
+			//browser, ok := browserRaw
+			// if !ok {
+			// 	// log.Println("cant cast browser to string")
+			// 	continue
+			// }
 
 			//			if ok, err := regexp.MatchString("Android", browser); ok && err == nil {
 			if ok := regexp1.MatchString(browserRaw); ok && err1 == nil {
@@ -80,6 +94,9 @@ func FastSearch(out io.Writer) {
 					uniqueBrowsers++
 				}
 			}
+		}
+
+		for _, browserRaw := range dataline.Browsers {
 
 			if ok := regexp2.MatchString(browserRaw); ok && err2 == nil {
 				isMSIE = true
@@ -104,6 +121,9 @@ func FastSearch(out io.Writer) {
 		// log.Println("Android and MSIE user:", user["name"], user["email"])
 		email := r.ReplaceAllString(dataline.Email, " [at] ")
 		strBuilder.WriteString(fmt.Sprintf("[%d] %s <%s>\n", i, dataline.Name, email))
+		//foundUsers += fmt.Sprintf("[%d] %s <%s>\n", i, user["name"], email)
+		
+		dataPool.Put(dataline)
 	}
 
 	fmt.Fprintln(out, strBuilder.String())
