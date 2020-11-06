@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../SandBox/TestProcess"
+		},
+		{
+			"path": "../SandBox/TestHTPP"
+		},
+		{
+			"path": "."
+		}
+	]
+}

@@ -24,7 +24,7 @@ go run main.go . -f
 ├───main_test.go (1318b)
 └───testdata
 	├───project
-	│	├───file	.txt (19b)
+	│	├───file.txt (19b)
 	│	└───gopher.png (70372b)
 	├───static
 	│	├───css
@@ -44,6 +44,7 @@ go run main.go .
 	│	├───html
 	│	└───js
 	└───zline
+		
 ```
 
 Замечания:
