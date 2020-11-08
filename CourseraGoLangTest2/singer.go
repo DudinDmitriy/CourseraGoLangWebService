@@ -8,16 +8,26 @@ import (
 
 // сюда писать код
 
+func executeJob(in chan interface{}, out chan interface{}, f job, wg *sync.WaitGroup) {
+	f(in, out)
+	close(out)
+	wg.Done()
+}
+
 // ExecutePipeline execute massiv function
 func ExecutePipeline(f ...job) {
 
+	var wg sync.WaitGroup
 	in := make(chan interface{})
+
 	for _, val := range f {
 		out := make(chan interface{})
-		go val(in, out)
+		wg.Add(1)
+		// fmt.Println(val)
+		go executeJob(in, out, val, &wg)
 		in = out
 	}
-
+	wg.Wait()
 }
 
 var mutexMD5 sync.Mutex
@@ -33,8 +43,9 @@ func myDataSignerCrc32(data string, ch chan string) {
 	ch <- DataSignerCrc32(data)
 }
 
-func mySingleHash(data string, out chan interface{}) {
+func mySingleHash(data string, wg *sync.WaitGroup, out chan interface{}) {
 
+	defer wg.Done()
 	res1 := make(chan string)
 	res2 := make(chan string)
 	res3 := make(chan string)
@@ -46,36 +57,45 @@ func mySingleHash(data string, out chan interface{}) {
 }
 
 func SingleHash(in, out chan interface{}) {
+
+	var wg sync.WaitGroup
+
 	for val := range in {
-		data := val.(string)
-		go mySingleHash(data, out)
+		dataint := val.(int)
+		data := fmt.Sprintf("%d", dataint)
+		wg.Add(1)
+		go mySingleHash(data, &wg, out)
 	}
-	close(out)
+	wg.Wait()
 }
 
-func myMultiHash(data string, out chan interface{}) {
+func myMultiHash(data string, wg *sync.WaitGroup, out chan interface{}) {
 
+	defer wg.Done()
 	chm := make([]chan string, 6)
 	for i := 0; i < 6; i++ {
 		ch := make(chan string)
-		pref := fmt.Sprintf("%02d", i)
-		myDataSignerCrc32(pref+data, ch)
+		pref := fmt.Sprintf("%d", i)
+		go myDataSignerCrc32(pref+data, ch)
 		chm[i] = ch
 	}
 	res := ""
 	for _, val := range chm {
 		res = res + <-val
 	}
+	fmt.Println("Data MulriHash", res)
 	out <- res
 }
 
 func MultiHash(in, out chan interface{}) {
 
+	var wg sync.WaitGroup
 	for val := range in {
 		data := val.(string)
-		go myMultiHash(data, out)
+		wg.Add(1)
+		go myMultiHash(data, &wg, out)
 	}
-	close(out)
+	wg.Wait()
 
 }
 
@@ -95,13 +115,11 @@ func CombineResults(in, out chan interface{}) {
 	sort.Sort(ressort(resm))
 	res := ""
 	for _, val := range resm {
-		res = res + val
+		if res != "" {
+			res += "_"
+		}
+		res += val
 	}
 	out <- res
-	close(out)
-
-}
-
-func main() {
 
 }
