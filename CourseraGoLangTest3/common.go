@@ -14,7 +14,6 @@ import (
 const filePath string = "./data/users.txt"
 
 func SlowSearch(out io.Writer) {
-
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -33,7 +32,6 @@ func SlowSearch(out io.Writer) {
 	lines := strings.Split(string(fileContents), "\n")
 
 	users := make([]map[string]interface{}, 0)
-	
 	for _, line := range lines {
 		user := make(map[string]interface{})
 		// fmt.Printf("%v %v\n", err, line)
@@ -110,11 +108,4 @@ func SlowSearch(out io.Writer) {
 
 	fmt.Fprintln(out, "found users:\n"+foundUsers)
 	fmt.Fprintln(out, "Total unique browsers", len(seenBrowsers))
-}
-
-func main() {
-	
-	fmt.Println("Main func is go")
-	FastSearch(os.Stdout)
-
 }
