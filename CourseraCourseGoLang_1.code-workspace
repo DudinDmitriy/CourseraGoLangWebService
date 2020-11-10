@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "CourseraGoLangTest3"
+		},
+		{
+			"path": "../SandBox/TestBinary"
 		}
 	]
 }
