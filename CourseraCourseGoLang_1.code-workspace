@@ -1,16 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "../SandBox/TestProcess"
-		},
-		{
-			"path": "../SandBox/TestHTPP"
-		},
-		{
-			"path": "CourseraGoLangTest3"
-		},
-		{
-			"path": "../SandBox/TestBinary"
+			"path": "CourseraGoLangTest4"
 		}
 	]
 }
